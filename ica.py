@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 class Recording:
     #Data paths
-    raw_data = ''
-    filtered_data = ''
+    dir_raw = ''
+    dir_filtered = ''
 
     #Parameters
     Fs = 250
@@ -36,7 +36,16 @@ class Recording:
         montage = mne.channels.make_standard_montage('standard_1020')
         self.filt_array.set_montage(montage)  
 
-         
+    #__________________________________ Functions ______________________________________
+
+    def load_data(self):
+        dir = self.dir_raw
+        data_key = 'raw_eeg_data'
+
+        #Load one recording
+        filename = f"/sub-{self.sub_nr}_ses-{self.ses_nr}_run-{self.run_nr}.mat"
+        f = dir + filename
+        self.data = scipy.io.loadmat(f)[data_key]
 
 
 
