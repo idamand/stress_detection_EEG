@@ -42,7 +42,7 @@ def extract_eeg_data(valid_recordings, data_type):
 
     eeg_data = {}
     for recording in valid_recordings:
-        subject, session, run = recording.split('_') #what does this do
+        subject, session, run = recording.split('_') #splits with regards to underscore _
         f_name = os.path.join(dir, f'sub-{subject}_ses{session}_run-{run}.mat')
 
         try:
