@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import logging
 import utils.variables as var
+import math
 
 def load_pss_labels(filename, threshold):
     '''
@@ -175,14 +176,23 @@ def compute_stai_labels(scores_df, cutoff):
     labels = {}
     for i in range(n_subjects):
         for j in range(n_sessions*n_runs):
-            score = scores_df.iloc[i, j]
-            if score < cutoff:
+            invalid_flag = False
+            scores = scores_df.iloc[i, j+1] #need j+1 because it took in subject number as first value
+            if scores == 0: 
+                invalid_flag = True
+            elif scores < cutoff:
                 label = 0
             else:
                 label = 1
-            subject = i + 1
-            session = j//n_runs + 1 
-            run = j % n_runs + 1
-            key = f'P{str(subject).zfill(3)}_S{str(session).zfill(3)}_{str(run).zfill(3)}'
-            labels[key] = label
+
+            if not invalid_flag:
+                subject = i + 1
+                session = j//n_runs + 1 
+                run = j % n_runs + 1
+                key = f'P{str(subject).zfill(3)}_S{str(session).zfill(3)}_{str(run).zfill(3)}'
+                labels[key] = label
+            else:
+                print('Invalid')
     return labels
+
+
