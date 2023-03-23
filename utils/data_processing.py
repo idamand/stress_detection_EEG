@@ -20,7 +20,7 @@ def read_mat_data(filename):
     data : instance of Raw object
         The EEG data contained in the file.
     """
-    return sio.loadmat(filename)
+    return scipy.io.loadmat(filename)
 
 
 def read_eeg_data(data_type, filename):
@@ -33,6 +33,8 @@ def read_eeg_data(data_type, filename):
         return 0
 
     data = scipy.io.loadmat(filename)[data_key]
+    data = data[:,:75000] # 5 MIN * 60 SEK/MIN * 250 SAMPLES/SEK = 75 000 SAMPLES
+
     info = mne.create_info(8, sfreq=var.SFREQ, ch_types= 'eeg', verbose=None)
     raw_array = mne.io.RawArray(data, info)
     mapping = {'0':'F4','1':'Fp2','2':'C3','3':'FC6','4':'O1','5':'Oz','6':'FT9','7':'T8'}
@@ -60,7 +62,7 @@ def extract_eeg_data(valid_recordings, data_type):
     eeg_data = {}
     for recording in valid_recordings:
         subject, session, run = recording.split('_') #splits with regards to underscore _
-        f_name = os.path.join(dir, f'sub-{subject}_ses{session}_run-{run}.mat')
+        f_name = os.path.join(dir, f'sub-{subject}_ses-{session}_run-{run}.mat')
 
         try:
             data = read_eeg_data(data_type, f_name)
