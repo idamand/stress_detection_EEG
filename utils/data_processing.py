@@ -6,6 +6,23 @@ import logging
 import utils.variables as var
 from sklearn.model_selection import StratifiedKFold
 
+def read_mat_data(filename):
+    """
+    Read .mat data from file.
+
+    Parameters
+    ----------
+    filename : str
+        Path to the file to be read.
+
+    Returns
+    -------
+    data : instance of Raw object
+        The EEG data contained in the file.
+    """
+    return sio.loadmat(filename)
+
+
 def read_eeg_data(data_type, filename):
     if data_type == 'raw':
         data_key = 'raw_eeg_data'

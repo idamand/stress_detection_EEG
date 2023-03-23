@@ -239,7 +239,7 @@ def plot_STAI_scores(scores):
     plt.ylabel("STAI-Y score")
     plt.title("STAI-Y score for each subject")
     plt.legend()
-    plt.ylim(ymin=15)  # this line
+    plt.ylim(ymin=19)  # this line
     plt.show()
 
 
