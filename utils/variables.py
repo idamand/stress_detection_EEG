@@ -1,9 +1,9 @@
 import os
 
-DIR_RAW = 'Data\Raw_eeg'
-DIR_FILTERED = 'Data\Filtered'
+DIR_RAW = 'Data/Raw_eeg'
+DIR_FILTERED = 'Data/Filtered'
 
-LABEL_PATH = 'Data\STAI_grading.xls'
+LABEL_PATH = 'Data/STAI_grading.xls'
 
 NUM_SUBJECTS = 28
 NUM_SESSIONS = 2
