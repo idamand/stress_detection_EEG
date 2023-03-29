@@ -12,4 +12,6 @@ NUM_RUNS = 2
 NUM_CHANNELS = 8
 SFREQ = 250
 
+NUM_SAMPLES = 75000
+
 DATA_TYPES = ['raw', 'filtered']
