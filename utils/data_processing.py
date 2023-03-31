@@ -4,7 +4,7 @@ import numpy as np
 import scipy
 import logging
 import utils.variables as var
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, train_test_split
 
 def read_mat_data(filename):
     """
@@ -76,7 +76,7 @@ def extract_eeg_data(valid_recordings, data_type):
 
 def segment_data(x_dict, y_dict, epoch_duration=5):
     '''
-    
+    return: dict
     '''
     overlap_duration = 0.0
 
@@ -102,48 +102,86 @@ def segment_data(x_dict, y_dict, epoch_duration=5):
 
     return x_epochs, y_epochs
 
-def stratified_kfold_split(x_epochs, y_epochs, n_splits=5, shuffle=True, random_state=None):
-    """
-    Perform k-fold cross-validation on a dataset of EEG epochs.
+def train_test_val_split(data, labels):
+    '''
+    Convert scores to labels based on low and high cutoffs.
+
     Parameters
     ----------
-    x_epochs : dict
-        A dictionary of EEG epochs, where each key is an epoch ID and each value is a numpy array of shape (n_channels, n_samples).
-    y_epochs : dict
-        A dictionary of target labels for each epoch, where each key is an epoch ID and each value is an integer target label.
-    n_splits : int, optional
-        The number of folds to create in the cross-validation. Default is 5.
-    shuffle : bool, optional
-        Whether to shuffle the data before creating folds. Default is True.
-    random_state : int or RandomState, optional
-        If an integer, `random_state` is the seed used by the random number generator. If a RandomState instance, `random_state` is the random number generator. If None, the random number generator is the RandomState instance used by `np.random`. Default is None.
+    data : dict
+        Dictionary containing the epoched data
+    labels : dict
+        Dictionary containing the epoched labels
+
     Returns
     -------
-    train_epochs : list of dicts
-        A list of training epochs for each fold, where each dictionary is of the same format as `x_epochs`.
-    test_epochs : list of dicts
-        A list of test epochs for each fold, where each dictionary is of the same format as `x_epochs`.
-    train_labels : list of dicts
-        A list of target labels for the training epochs for each fold, where each dictionary is of the same format as `y_epochs`.
-    test_labels : list of dicts
-        A list of target labels for the test epochs for each fold, where each dictionary is of the same format as `y_epochs`.
-    """
+    numpy.ndarray
+        An array with shape `(n_subjects, n_sessions * n_runs)` containing
+        labels. Each row corresponds to a subject, and each column
+        corresponds to a session/run. The values in the array are integers
+        representing the label (0, 1, or 2) for that subject, session, and
+        run.
+    '''
 
-    subject_ids = np.unique(['_'.join(k.split('_')[:-1]) for k in x_epochs.keys()])
-    y_subjects = np.array([y_epochs[f'{subject_id}_epoch0'] for subject_id in subject_ids])
+    #subject_list = []
 
-    skf = StratifiedKFold(n_splits=n_splits, shuffle=shuffle, random_state=random_state)
+    keys_list = list(data.keys())
+    
+    #Creates a list of all subjects
+    subject_list = []
+    for i in range(var.NUM_SUBJECTS+1):
+        subject = f'P{str(i).zfill(3)}'
+        for key in keys_list:
+            if subject in key and subject not in subject_list:
+                subject_list.append(subject)
 
-    train_epochs = []
-    train_labels = []
-    test_epochs = []
-    test_labels = []
-    for train_subjects, test_subjects in skf.split(subject_ids, y_subjects):
-        train_subjects_list = subject_ids[train_subjects]
-        test_subjects_list = subject_ids[test_subjects]
-        train_epochs.append({k: v for k, v in x_epochs.items() if '_'.join(k.split('_')[:-1]) in train_subjects_list})
-        train_labels.append({k: v for k, v in y_epochs.items() if '_'.join(k.split('_')[:-1]) in train_subjects_list})
-        test_epochs.append({k: v for k, v in x_epochs.items() if '_'.join(k.split('_')[:-1]) in test_subjects_list})
-        test_labels.append({k: v for k, v in y_epochs.items() if '_'.join(k.split('_')[:-1]) in test_subjects_list})
+    mean_labels_list = []
+    for i in range(var.NUM_SUBJECTS+1):
+        sum_label = 0
+        num_recordings = 0
+        subject = f'P{str(i).zfill(3)}'
+        for key, value in labels.items():
+            if subject in key:
+                sum_label += value
+                num_recordings += 1
+        if num_recordings == 0:
+            continue
+        else:
+            mean_label = sum_label/num_recordings
+            mean_labels_list.append(round(mean_label,0))
 
-    return train_epochs, test_epochs, train_labels, test_labels
+    subjects, subjects_test, mean_labels, mean_labels_test = train_test_split(subject_list, mean_labels_list, 
+                                                                            test_size= 0.2, random_state=42, 
+                                                                            stratify = mean_labels_list)
+    subjects_train, subjects_val, mean_labels_train, mean_labels_val = train_test_split(subjects, mean_labels, 
+                                                                                        test_size=0.25, random_state=42, 
+                                                                                        stratify = mean_labels)
+    
+    print('subjects: ', subjects, '\n subjects test: ', subjects_test, '\n subjects train: ', subjects_train, '\n subjects val: ', subjects_val)
+    
+    train_data, train_labels= reconstruct_dicts(subjects_train, data, labels)
+    test_data, test_labels = reconstruct_dicts(subjects_test, data, labels)
+    val_data, val_labels = reconstruct_dicts(subjects_val, data, labels)
+
+    return train_data, train_labels, test_data, test_labels, val_data, val_labels
+
+def reconstruct_dicts(subjects_list, x_dict, y_dict):
+    '''
+    Reconstructs the dictionarys after the dataset has been split into train-, validation- and test-sets
+    '''
+    data_dict = {}
+    labels_dict = {}
+
+    for subject in subjects_list:
+        # Reconstructing data dict
+        for key, val in x_dict.items():
+            if subject in key:
+                data_dict[key] = val
+
+        #Reconstructing labels dict
+        for key, val in y_dict.items():
+            if subject in key:
+                labels_dict[key] = val
+
+    return(data_dict, labels_dict)
+    

@@ -1,10 +1,11 @@
+from matplotlib import pyplot as plt
 import numpy as np
+from sklearn.metrics import plot_confusion_matrix
 
-from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from metrics import compute_metrics
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import GridSearchCV
 
 from EEGNet.EEGModels import EEGNet
 #from tensorflow.keras import utils as np_utils
@@ -16,25 +17,37 @@ import utils.variables as var
 import mne
 
 
-def SVM(data, labels):
+def SVM(train_data, test_data, train_labels, test_labels):
     '''
-    Input: data of shape (n_samples, n_features) and labels of shape (n_samples). Performs support vector classification.
+    Parameters
+    ----------
+    train_data : dict
+        Path to the file to be read.
+    test_data : dict
+        Test data
+    train_labels : dict
+        Labels of the train data
+    test_labels : dict
+        Labels of the test data
+
+    Returns
+    -------
+    metrics : confusion matrix
+        The confusion matrix with the results 
     '''
-    #x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42) #TODO: change to stratified k_fold
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    for train_index, test_index in skf.split(data, labels):
-        x_train, x_test = data[train_index], data[test_index]
-        y_train, y_test = labels[train_index], labels[test_index]
 
-    c = 1.0
-    kernel = 'rbf'
-    weights = {0:67, 1:33}
+    param_grid = {
+        'C': [0.1, 1, 10, 100, 1000],
+        'kernel': ['rbf', 'poly']
+    }
 
-    svm_clf = SVC(C=c, kernel=kernel, class_weight=weights)
-    svm_clf.fit(x_train, y_train)
+    #weights = {0:67, 1:33}
 
-    y_pred = svm_clf.predict(x_test)
-    y_true = y_test
+    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True)
+    svm_clf.fit(train_data, train_labels)
+
+    y_pred = svm_clf.predict(test_data)
+    y_true = test_labels
 
     metrics = compute_metrics(y_true, y_pred)
 
@@ -45,14 +58,8 @@ def RF(data, labels):
     '''
     Input: data of shape (n_samples, n_features), and labels of shape (n_samples). Performs random forest classification
     '''
-    #x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42) #TODO: change to stratified k-fold
 
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    for train_index, test_index in skf.split(data, labels):
-        x_train, x_test = data[train_index], data[test_index]
-        y_train, y_test = labels[train_index], labels[test_index]
-
-
+    '''
     n_estimators = 10
     max_depth = 5
     weights = {0:67, 1:33}
@@ -64,6 +71,7 @@ def RF(data, labels):
     y_true = y_test
 
     metrics = compute_metrics(y_true, y_pred)
+    '''
 
     return metrics
 
@@ -128,5 +136,9 @@ def EEGNet(train_data, test_data, val_data, train_labels, test_labels, val_label
     preds       = probs.argmax(axis = -1)  
     acc         = np.mean(preds == test_labels)
     print("Classification accuracy: %f " % (acc))
+
+    names        = ['Stressed', 'Not stressed']
+    plt.figure(0)
+    plot_confusion_matrix(preds, test_labels, names, title = 'EEGNet-8,2')
     return probs
 
