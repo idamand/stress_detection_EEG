@@ -8,10 +8,10 @@ from metrics import compute_metrics
 from sklearn.model_selection import GridSearchCV
 
 from EEGNet.EEGModels import EEGNet
-#from tensorflow.keras import utils as np_utils
-#from tensorflow.keras.callbacks import ModelCheckpoint
-from keras.utils import np_utils
-from keras.callbacks import ModelCheckpoint
+from tensorflow.keras import utils as np_utils
+from tensorflow.keras.callbacks import ModelCheckpoint
+#from keras.utils import np_utils
+#from keras.callbacks import ModelCheckpoint
 
 import utils.variables as var
 import mne
@@ -73,14 +73,14 @@ def RF(data, labels):
     metrics = compute_metrics(y_true, y_pred)
     '''
 
-    return metrics
+    return 0
 
 
-def EEGNet(train_data, test_data, val_data, train_labels, test_labels, val_labels):
+def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels, val_labels):
 
     # configure the EEGNet-8,2,16 model with kernel length of 32 samples (other 
     # model configurations may do better, but this is a good starting point)
-    model = EEGNet(nb_classes = 2, Chans = var.NUM_CHANNELS, Samples = var.NUM_SAMPLES, 
+    model = EEGNet(nb_classes = 2, Chans = var.NUM_CHANNELS, Samples = var.EPOCH_LENGTH*var.SFREQ, 
                    dropoutRate = 0.5, kernLength = 32, F1 = 8, D = 2, F2 = 16, 
                    dropoutType = 'Dropout')
     

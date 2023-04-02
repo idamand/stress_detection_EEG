@@ -5,6 +5,7 @@ import scipy
 import logging
 import utils.variables as var
 from sklearn.model_selection import StratifiedKFold, train_test_split
+import scipy.io as sio
 
 def read_mat_data(filename):
     """
@@ -32,7 +33,7 @@ def read_eeg_data(data_type, filename):
         print(f'No data with data_type = {data_type} found')
         return 0
 
-    data = scipy.io.loadmat(filename)[data_key]
+    data = sio.loadmat(filename)[data_key]
     data = data[:,:75000] # 5 MIN * 60 SEK/MIN * 250 SAMPLES/SEK = 75 000 SAMPLES
 
     info = mne.create_info(8, sfreq=var.SFREQ, ch_types= 'eeg', verbose=None)
@@ -185,3 +186,18 @@ def reconstruct_dicts(subjects_list, x_dict, y_dict):
 
     return(data_dict, labels_dict)
     
+def dict_to_arr(data_dict):
+    '''
+    Turns dictionary into numpy array
+    '''
+    keys_list = list(data_dict.keys())
+    
+    data_arr = np.empty((len(keys_list), var.NUM_CHANNELS, var.EPOCH_LENGTH*var.SFREQ))
+    
+    i = 0
+    for key in keys_list:
+        data = data_dict[key]
+        data_arr[i] = data
+        i += 1
+
+    return data_arr

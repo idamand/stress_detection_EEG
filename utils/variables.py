@@ -13,5 +13,6 @@ NUM_CHANNELS = 8
 SFREQ = 250
 
 NUM_SAMPLES = 75000
+EPOCH_LENGTH = 5
 
 DATA_TYPES = ['raw', 'filtered']
