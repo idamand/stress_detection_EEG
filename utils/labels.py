@@ -243,5 +243,13 @@ def plot_STAI_scores(scores):
     plt.show()
 
 
+def counting_labels(labels):
+    count_0 = sum(1 for v in labels.values() if v == 0)
 
+    count_1 = sum(1 for v in labels.values() if v == 1)
 
+    print('0 (non-stressed): ', count_0, ' 1 (stressed): ', count_1)
+
+    print('Percentage non-stressed: ', count_0/(count_0+count_1))
+    print('Percentage stressed: ', count_1/(count_1+count_0))
+    return 0

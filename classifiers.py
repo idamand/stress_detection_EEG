@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
-from sklearn.metrics import plot_confusion_matrix
+#from sklearn.metrics import plot_confusion_matrix
 
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -12,6 +12,7 @@ from tensorflow.keras import utils as np_utils
 from tensorflow.keras.callbacks import ModelCheckpoint
 #from keras.utils import np_utils
 #from keras.callbacks import ModelCheckpoint
+from pyriemann.utils.viz import plot_confusion_matrix
 
 import utils.variables as var
 import mne
@@ -80,12 +81,12 @@ def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels
 
     # configure the EEGNet-8,2,16 model with kernel length of 32 samples (other 
     # model configurations may do better, but this is a good starting point)
-    model = EEGNet(nb_classes = 2, Chans = var.NUM_CHANNELS, Samples = var.EPOCH_LENGTH*var.SFREQ, 
+    model = EEGNet(nb_classes=2, Chans=var.NUM_CHANNELS, Samples=(var.EPOCH_LENGTH*var.SFREQ)+1, 
                    dropoutRate = 0.5, kernLength = 32, F1 = 8, D = 2, F2 = 16, 
                    dropoutType = 'Dropout')
     
     # compile the model and set the optimizers
-    model.compile(loss='categorical_crossentropy', optimizer='adam', 
+    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', 
                   metrics = ['accuracy'])
     
     # count number of parameters in the model
@@ -137,7 +138,7 @@ def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels
     acc         = np.mean(preds == test_labels)
     print("Classification accuracy: %f " % (acc))
 
-    names        = ['Stressed', 'Not stressed']
+    names        = ['Not stressed', 'Stressed']
     plt.figure(0)
     plot_confusion_matrix(preds, test_labels, names, title = 'EEGNet-8,2')
     return probs
