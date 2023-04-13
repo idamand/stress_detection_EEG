@@ -90,16 +90,12 @@ def segment_data(x_dict, y_dict, epoch_duration=5):
                                               stop=5*60, 
                                               duration=epoch_duration, 
                                               overlap=overlap_duration)
-        
-        #print(events.shape)
 
         epochs = mne.Epochs(raw_array, 
                             events, tmin=0, 
                             tmax=epoch_duration, 
                             baseline=None, 
                             preload=True)
-        
-        print(epochs.info)
         
         for i, epoch in enumerate(epochs):
             x_epochs[f'{key}_epoch{i}'] = epoch
@@ -162,7 +158,7 @@ def train_test_val_split(data, labels):
                                                                                         test_size=0.25, random_state=42, 
                                                                                         stratify = mean_labels)
     
-    print('subjects: ', subjects, '\n subjects test: ', subjects_test, '\n subjects train: ', subjects_train, '\n subjects val: ', subjects_val)
+    print('Subjects test: ', subjects_test, '\n Subjects train: ', subjects_train, '\n Subjects val: ', subjects_val)
     
     train_data, train_labels= reconstruct_dicts(subjects_train, data, labels)
     test_data, test_labels = reconstruct_dicts(subjects_test, data, labels)
