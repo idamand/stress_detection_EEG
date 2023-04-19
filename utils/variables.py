@@ -1,7 +1,7 @@
 import os
 
 DIR_RAW = 'Data/Raw_eeg'
-DIR_FILTERED = 'Data/Filtered'
+DIR_FILTERED = 'Data/Filtered_eeg'
 
 LABEL_PATH = 'Data/STAI_grading.xls'
 
