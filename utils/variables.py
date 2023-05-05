@@ -1,8 +1,9 @@
 import os
 
 DIR_RAW = 'Data/Raw_eeg'
-DIR_FILTERED = 'Data/SSP_eeg'
-DIR_PSD = 'Data/psd'
+DIR_SSP = 'Data/SSP_eeg'
+DIR_PSD = 'Data/PSD_data'
+DIR_DECOMP = 'Data/Decomp_data'
 
 LABEL_PATH = 'Data/STAI_grading.xls'
 

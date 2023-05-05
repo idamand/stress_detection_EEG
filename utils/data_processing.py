@@ -27,8 +27,10 @@ def read_mat_data(filename):
 def read_eeg_data(data_type, filename):
     if data_type == 'raw':
         data_key = 'raw_eeg_data'
-    elif data_type == 'filtered':
-        data_key = 'Clean_data'
+    elif data_type == 'ssp':
+        data_key = 'ssp_eeg_data'
+    elif data_type == 'psd':
+        data_key = 'psd_data'
     else:
         print(f'No data with data_type = {data_type} found')
         return 0
