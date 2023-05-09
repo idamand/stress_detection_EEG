@@ -28,7 +28,7 @@ def read_eeg_data(data_type, filename):
     if data_type == 'raw':
         data_key = 'raw_eeg_data'
     elif data_type == 'ssp':
-        data_key = 'ssp_eeg_data'
+        data_key = 'Clean_data'
     elif data_type == 'psd':
         data_key = 'psd_data'
     else:
@@ -55,8 +55,8 @@ def extract_eeg_data(valid_recordings, data_type):
     if data_type == 'raw':
         dir         = var.DIR_RAW
         data_key    = 'Data'
-    elif data_type == 'filtered':
-        dir         = var.DIR_FILTERED
+    elif data_type == 'ssp':
+        dir         = var.DIR_SSP
         data_key    = 'Clean data'
     else:
         print('No files matching data type found')
