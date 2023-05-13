@@ -39,8 +39,15 @@ def filter_valid_recordings(recordings, data_type):
     valid_recs : list
         A list of valid recordings in the format 'P00X_S00X_00X'.
     """
-
-    dir = var.DIR_RAW
+    if data_type == 'raw':
+        dir = var.DIR_RAW
+    elif data_type == 'ssp':
+        dir = var.DIR_SSP
+    elif data_type == 'decomp':
+        dir = var.DIR_DECOMP
+    else:
+        print('No data with datatype = {data_type} found')
+    
     valid_recordings = []
     for recording in recordings:
         subject, session, run = recording.split('_')

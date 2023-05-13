@@ -29,8 +29,8 @@ def read_eeg_data(data_type, filename):
         data_key = 'raw_eeg_data'
     elif data_type == 'ssp':
         data_key = 'Clean_data'
-    elif data_type == 'psd':
-        data_key = 'psd_data'
+    elif data_type == 'decomp':
+        data_key = '"Decomp_data"'
     else:
         print(f'No data with data_type = {data_type} found')
         return 0
@@ -47,7 +47,7 @@ def read_eeg_data(data_type, filename):
 
 def extract_eeg_data(valid_recordings, data_type):
     '''
-    
+    Construct dictionairies with EEG data.
     '''
 
     assert(data_type in var.DATA_TYPES)
@@ -58,6 +58,9 @@ def extract_eeg_data(valid_recordings, data_type):
     elif data_type == 'ssp':
         dir         = var.DIR_SSP
         data_key    = 'Clean data'
+    elif data_type == 'decomp':
+        dir         = var.DIR_DECOMP
+        data_key    = 'Decomp data'
     else:
         print('No files matching data type found')
         return 0

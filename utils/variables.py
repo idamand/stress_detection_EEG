@@ -21,4 +21,4 @@ CHANNELS = ['F4', 'Fp2', 'C3', 'FC6', 'O1', 'Oz', 'FT9', 'T8']
 NUM_SAMPLES = 75000
 EPOCH_LENGTH = 5
 
-DATA_TYPES = ['raw', 'ssp', 'psd']
+DATA_TYPES = ['raw', 'ssp', 'decomp']
