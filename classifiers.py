@@ -38,41 +38,70 @@ def SVM(train_data, test_data, train_labels, test_labels):
     '''
 
     param_grid = {
-        'C': [0.1, 1, 10, 100, 1000],
-        'kernel': ['rbf', 'poly']
+        'C': [0.01, 0.1, 1, 10, 100, 1000, 10000],
+        'kernel': ['rbf', 'poly', 'sigmoid', 'linear'],
+        'gamma' : [1,0.1,0.01,0.001]
     }
 
     #weights = {0:67, 1:33}
 
-    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True)
+    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, cv=10)
     svm_clf.fit(train_data, train_labels)
 
     y_pred = svm_clf.predict(test_data)
     y_true = test_labels
+
+    cv_results = svm_clf.cv_results_
+    accuracy = cv_results['mean_test_score']
+    print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
+    print('--------------------- BEST PARAMETERS FROM GRIDSEARCH --------------------- \n', svm_clf.best_params_)
+    print(' OVERALL ACCURACY:', np.round(np.sum(accuracy)/len(accuracy)*100,2))
+
+    plt.figure(1)
+    plt.plot(accuracy)
+    plt.xlabel('Fold')
+    plt.ylabel('Mean accuracy of test score')
+    plt.show()
 
     metrics = compute_metrics(y_true, y_pred)
 
     return metrics
 
 
-def RF(data, labels):
+def RF(train_data, test_data, train_labels, test_labels):
     '''
     Input: data of shape (n_samples, n_features), and labels of shape (n_samples). Performs random forest classification
     '''
 
-    '''
-    n_estimators = 10
-    max_depth = 5
-    weights = {0:67, 1:33}
+    param_grid = {
+        'n_estimators' : [100, 200, 300, 400, 500],
+        'criterion' : ['gini', 'entropy'],
+        'max_features' : ['auto', 'sqrt', 'log2'],
+        'max_depth' : [70, 80, 90, 100, 'None']
+    }
     
-    rf_clf = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, class_weight=weights, random_state=42)
-    rf_clf.fit(x_train, y_train)
+    #weights = {0:67, 1:33}
+    
+    rf_clf = GridSearchCV(RandomForestClassifier(), param_grid=param_grid, refit=True, cv=10)
+    rf_clf.fit(train_data, train_labels)
 
-    y_pred = rf_clf.predict(x_test)
-    y_true = y_test
+    y_pred = rf_clf.predict(test_data)
+    y_true = test_labels
+
+    cv_results = rf_clf.cv_results_
+    accuracy = cv_results['mean_test_score']
+    print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
+    print('--------------------- BEST PARAMETERS FROM GRIDSEARCH --------------------- \n', rf_clf.best_params_)
+    print(' OVERALL ACCURACY:', np.round(np.sum(accuracy)/len(accuracy)*100,2))
+
+    plt.figure(1)
+    plt.plot(accuracy)
+    plt.xlabel('Fold')
+    plt.ylabel('Mean accuracy of test score')
+    plt.show()
 
     metrics = compute_metrics(y_true, y_pred)
-    '''
+   
 
     return 0
 
