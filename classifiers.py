@@ -4,6 +4,7 @@ import numpy as np
 
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from metrics import compute_metrics
 from sklearn.model_selection import GridSearchCV
 
@@ -45,7 +46,7 @@ def SVM(train_data, test_data, train_labels, test_labels):
 
     #weights = {0:67, 1:33}
 
-    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, cv=10)
+    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, n_jobs=-1, cv=10)
     svm_clf.fit(train_data, train_labels)
 
     y_pred = svm_clf.predict(test_data)
@@ -82,7 +83,7 @@ def RF(train_data, test_data, train_labels, test_labels):
     
     #weights = {0:67, 1:33}
     
-    rf_clf = GridSearchCV(RandomForestClassifier(), param_grid=param_grid, refit=True, cv=10)
+    rf_clf = GridSearchCV(RandomForestClassifier(), param_grid=param_grid, refit=True, n_jobs=-1, cv=10)
     rf_clf.fit(train_data, train_labels)
 
     y_pred = rf_clf.predict(test_data)
@@ -101,9 +102,55 @@ def RF(train_data, test_data, train_labels, test_labels):
     plt.show()
 
     metrics = compute_metrics(y_true, y_pred)
-   
 
-    return 0
+
+    return metrics
+
+def knn(train_data, test_data, train_labels, test_labels):
+    '''
+    Explanation
+
+    Parameters
+    ----------
+    train_data : ndarray
+        An array containing the training data, shape(n_recordings, n_channels*n_features)
+    test_data : ndarray
+        An array containing the test data, shape(n_recordings, n_channels*n_features)
+    train_labels : ndarray
+        An array containing the labels of the training set, shape(n_recordings, )
+
+    Returns
+    -------
+    metrics : something
+
+    '''
+    param_grid = {
+        'n_neighbors': [1, 3, 5, 7, 9],
+        'leaf_size': [5, 10, 20, 30, 40, 50],
+        'p': [1, 2]
+    }
+
+    knn_clf = GridSearchCV(KNeighborsClassifier(), param_grid, refit=True, n_jobs=-1, cv = 10)
+    knn_clf.fit(train_data, train_labels)
+
+    y_pred = knn_clf.predict(test_data)
+    y_true = test_labels
+
+    cv_results = knn_clf.cv_results_
+    accuracy = cv_results['mean_test_score']
+    print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
+    print('--------------------- BEST PARAMETERS FROM GRIDSEARCH --------------------- \n', knn_clf.best_params_)
+    print(' OVERALL ACCURACY:', np.round(np.sum(accuracy)/len(accuracy)*100,2))    
+
+    plt.figure(1)
+    plt.plot(accuracy)
+    plt.xlabel('Fold')
+    plt.ylabel('Mean accuracy of test score')
+    plt.show()
+
+    metrics = compute_metrics(y_true, y_pred)
+
+    return metrics
 
 
 def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels, val_labels):

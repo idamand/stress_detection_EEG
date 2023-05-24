@@ -155,9 +155,9 @@ def compute_stai_labels(scores_df, cutoff):
     for i in range(n_subjects):
         for j in range(n_sessions*n_runs):
             scores = scores_df.iloc[i, j+1] #need j+1 because it took in subject number as first value
-            if scores < cutoff:
+            if scores < cutoff: #not stressed
                 label = 0
-            else:
+            else: #stressed
                 label = 1
 
             subject = i + 1
