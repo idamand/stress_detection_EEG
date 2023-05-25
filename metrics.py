@@ -36,9 +36,7 @@ def compute_metrics(y_true, y_pred):
     
     plt.show
 
-    metrics = np.array([accuracy, sensitivity, specificity])
-
-    return metrics
+    
 
 
 

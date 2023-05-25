@@ -46,7 +46,7 @@ def SVM(train_data, test_data, train_labels, test_labels):
 
     #weights = {0:67, 1:33}
 
-    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, n_jobs=-1, cv=10)
+    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, n_jobs=-1, cv=10, scoring='accuracy')
     svm_clf.fit(train_data, train_labels)
 
     y_pred = svm_clf.predict(test_data)
@@ -54,7 +54,7 @@ def SVM(train_data, test_data, train_labels, test_labels):
 
     cv_results = svm_clf.cv_results_
     accuracy = cv_results['mean_test_score']
-    print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
+    #print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
     print('--------------------- BEST PARAMETERS FROM GRIDSEARCH --------------------- \n', svm_clf.best_params_)
     print(' OVERALL ACCURACY:', np.round(np.sum(accuracy)/len(accuracy)*100,2))
 
@@ -91,7 +91,7 @@ def RF(train_data, test_data, train_labels, test_labels):
 
     cv_results = rf_clf.cv_results_
     accuracy = cv_results['mean_test_score']
-    print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
+    #print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
     print('--------------------- BEST PARAMETERS FROM GRIDSEARCH --------------------- \n', rf_clf.best_params_)
     print(' OVERALL ACCURACY:', np.round(np.sum(accuracy)/len(accuracy)*100,2))
 
@@ -153,11 +153,11 @@ def knn(train_data, test_data, train_labels, test_labels):
     return metrics
 
 
-def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels, val_labels):
+def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels, val_labels, epoch_duration):
 
     # configure the EEGNet-8,2,16 model with kernel length of 32 samples (other 
     # model configurations may do better, but this is a good starting point)
-    model = EEGNet(nb_classes=2, Chans=var.NUM_CHANNELS, Samples=(var.EPOCH_LENGTH*var.SFREQ)+1, 
+    model = EEGNet(nb_classes=2, Chans=var.NUM_CHANNELS, Samples=(epoch_duration*var.SFREQ)+1, 
                    dropoutRate = 0.5, kernLength = 64, F1 = 8, D = 2, F2 = 16, 
                    dropoutType = 'Dropout')
     

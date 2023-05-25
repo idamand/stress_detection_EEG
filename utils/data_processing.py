@@ -108,9 +108,9 @@ def segment_data(x_dict, y_dict, epoch_duration=5):
 
     return x_epochs, y_epochs
 
-def train_test_val_split(data, labels):
+def create_train_test_split(data, labels, epoch_duration):
     '''
-    Convert scores to labels based on low and high cutoffs.
+    Split data and labels into train and test sets to be used for k-fold cross validation. The split is done across subject to ensure no subject is in both train or test sets.
 
     Parameters
     ----------
@@ -121,15 +121,13 @@ def train_test_val_split(data, labels):
 
     Returns
     -------
-    numpy.ndarray
+    train_data : numpy.ndarray
         An array with shape `(n_subjects, n_sessions * n_runs)` containing
         labels. Each row corresponds to a subject, and each column
         corresponds to a session/run. The values in the array are integers
         representing the label (0, 1, or 2) for that subject, session, and
         run.
     '''
-
-    #subject_list = []
 
     keys_list = list(data.keys())
     
@@ -156,20 +154,26 @@ def train_test_val_split(data, labels):
             mean_label = sum_label/num_recordings
             mean_labels_list.append(round(mean_label,0))
 
-    subjects, subjects_test, mean_labels, mean_labels_test = train_test_split(subject_list, mean_labels_list, 
-                                                                            test_size= 0.2, random_state=42, 
-                                                                            stratify = mean_labels_list)
-    subjects_train, subjects_val, mean_labels_train, mean_labels_val = train_test_split(subjects, mean_labels, 
-                                                                                        test_size=0.25, random_state=42, 
-                                                                                        stratify = mean_labels)
-    
-    print('Subjects test: ', subjects_test, '\n Subjects train: ', subjects_train, '\n Subjects val: ', subjects_val)
-    
-    train_data, train_labels= reconstruct_dicts(subjects_train, data, labels)
-    test_data, test_labels = reconstruct_dicts(subjects_test, data, labels)
-    val_data, val_labels = reconstruct_dicts(subjects_val, data, labels)
+    subjects_train, subjects_test, mean_labels_train, mean_labels_test = train_test_split(subject_list, mean_labels_list,
+                                                                                          test_size=0.2, random_state=42,
+                                                                                          stratify=mean_labels_list)
 
-    return train_data, train_labels, test_data, test_labels, val_data, val_labels
+    for subject in subjects_train:
+        if subject in subjects_test:
+            print(f'ERROR: Subject {subject} in both training and test list') 
+   
+    print('Subjects test: ', subjects_test, '\n Subjects train: ', subjects_train)
+    
+    train_data_dict, train_labels_dict = reconstruct_dicts(subjects_train, data, labels)
+    test_data_dict, test_labels_dict   = reconstruct_dicts(subjects_test, data, labels)
+
+    train_data      = dict_to_arr(train_data_dict, epoch_duration)
+    test_data       = dict_to_arr(test_data_dict, epoch_duration)
+
+    train_labels    = np.reshape(np.array(list(train_labels_dict.values())), (len(train_data_dict),1))
+    test_labels     = np.reshape(np.array(list(test_labels_dict.values())), (len(test_data_dict),1))
+
+    return train_data, train_labels, test_data, test_labels
 
 def reconstruct_dicts(subjects_list, x_dict, y_dict):
     '''
@@ -191,13 +195,13 @@ def reconstruct_dicts(subjects_list, x_dict, y_dict):
 
     return(data_dict, labels_dict)
     
-def dict_to_arr(data_dict):
+def dict_to_arr(data_dict, epoch_duration):
     '''
     Turns dictionary into numpy array
     '''
     keys_list = list(data_dict.keys())
     
-    data_arr = np.empty((len(keys_list), var.NUM_CHANNELS, var.EPOCH_LENGTH*var.SFREQ+1))
+    data_arr = np.empty((len(keys_list), var.NUM_CHANNELS, epoch_duration*var.SFREQ+1))
     
     i = 0
     for key in keys_list:
