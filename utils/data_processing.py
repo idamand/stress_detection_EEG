@@ -173,6 +173,9 @@ def create_train_test_split(data, labels, epoch_duration):
     train_labels    = np.reshape(np.array(list(train_labels_dict.values())), (len(train_data_dict),1))
     test_labels     = np.reshape(np.array(list(test_labels_dict.values())), (len(test_data_dict),1))
 
+    train_labels    = train_labels.ravel()
+    test_labels     = test_labels.ravel()
+
     return train_data, train_labels, test_data, test_labels
 
 def reconstruct_dicts(subjects_list, x_dict, y_dict):

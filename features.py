@@ -99,6 +99,22 @@ def time_series_features(data):
 
     return features
 
+def psd_features(data):
+    sfreq = var.SFREQ
+    features_per_channel = 1
+    n_recordings, n_channels, n_samples = data.shape
+
+    features = np.empty([n_recordings, n_channels*features_per_channel])
+
+    for i in range(n_recordings):
+        samples = data[i]
+        psd     = mnf.compute_pow_freq_bands(sfreq=sfreq, data=samples)
+        features[i] = np.concatenate([psd])
+
+    features = features.reshape([n_recordings, n_channels*features_per_channel])
+
+    return features
+
 def all_features(data):
     '''
     Compute hjorth, entropy and time-series features in one

@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from metrics import compute_metrics
 from sklearn.model_selection import GridSearchCV
+from sklearn.preprocessing import RobustScaler, StandardScaler
 
 from EEGNet.EEGModels import EEGNet
 from tensorflow.keras import utils as np_utils
@@ -19,7 +20,7 @@ import utils.variables as var
 import mne
 
 
-def SVM(train_data, test_data, train_labels, test_labels):
+def svm(train_data, test_data, train_labels, test_labels):
     '''
     Parameters
     ----------
@@ -45,6 +46,9 @@ def SVM(train_data, test_data, train_labels, test_labels):
     }
 
     #weights = {0:67, 1:33}
+    scaler = RobustScaler()
+    train_data = scaler.fit_transform(train_data)
+    test_data = scaler.transform(test_data)
 
     svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, n_jobs=-1, cv=10, scoring='accuracy')
     svm_clf.fit(train_data, train_labels)
@@ -69,7 +73,7 @@ def SVM(train_data, test_data, train_labels, test_labels):
     return metrics
 
 
-def RF(train_data, test_data, train_labels, test_labels):
+def rf(train_data, test_data, train_labels, test_labels):
     '''
     Input: data of shape (n_samples, n_features), and labels of shape (n_samples). Performs random forest classification
     '''
