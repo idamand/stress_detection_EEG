@@ -50,7 +50,7 @@ def svm(train_data, test_data, train_labels, test_labels):
     train_data = scaler.fit_transform(train_data)
     test_data = scaler.transform(test_data)
 
-    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, n_jobs=-1, cv=10, scoring='accuracy')
+    svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, n_jobs=-1, cv=10)
     svm_clf.fit(train_data, train_labels)
 
     y_pred = svm_clf.predict(test_data)
