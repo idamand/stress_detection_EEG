@@ -82,7 +82,7 @@ def time_series_features(data):
         An ndarray of the computed features
     '''
     sfreq = var.SFREQ
-    features_per_channel = 4
+    features_per_channel = 3
     n_recordings, n_channels, n_samples = data.shape
 
     features = np.empty([n_recordings, n_channels*features_per_channel])
@@ -92,8 +92,7 @@ def time_series_features(data):
         ptp_amp     = mnf.compute_ptp_amp(data=samples)
         variance    = mnf.compute_variance(data=samples)
         rms         = mnf.compute_rms(data=samples)
-        mean        = mnf.compute_mean(data=samples)
-        features[i] = np.concatenate([ptp_amp, variance, rms, mean])
+        features[i] = np.concatenate([ptp_amp, variance, rms])
 
     features = features.reshape([n_recordings, n_channels*features_per_channel])
 

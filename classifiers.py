@@ -41,14 +41,17 @@ def svm(train_data, test_data, train_labels, test_labels):
 
     param_grid = {
         'C': [0.01, 0.1, 1, 10, 100, 1000, 10000],
-        'kernel': ['rbf', 'poly', 'sigmoid', 'linear'],
-        'gamma' : [1,0.1,0.01,0.001]
+        'kernel': ['poly', 'sigmoid', 'linear', 'rbf']
     }
 
-    #weights = {0:67, 1:33}
-    scaler = RobustScaler()
+    scaler = StandardScaler()
     train_data = scaler.fit_transform(train_data)
     test_data = scaler.transform(test_data)
+
+    #weights = {0:67, 1:33}
+    #scaler = RobustScaler()
+    #train_data = scaler.fit_transform(train_data)
+    #test_data = scaler.transform(test_data)
 
     svm_clf = GridSearchCV(SVC(), param_grid=param_grid, refit=True, n_jobs=-1, cv=10)
     svm_clf.fit(train_data, train_labels)
