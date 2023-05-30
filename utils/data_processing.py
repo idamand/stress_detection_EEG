@@ -204,7 +204,7 @@ def dict_to_arr(data_dict, epoch_duration):
     '''
     keys_list = list(data_dict.keys())
     
-    data_arr = np.empty((len(keys_list), var.NUM_CHANNELS, epoch_duration*var.SFREQ+1))
+    data_arr = np.empty((len(keys_list), var.NUM_CHANNELS, int(epoch_duration*var.SFREQ)+1))
     
     i = 0
     for key in keys_list:
