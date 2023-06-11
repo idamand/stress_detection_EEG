@@ -82,10 +82,9 @@ def rf(train_data, test_data, train_labels, test_labels):
     '''
 
     param_grid = {
-        'n_estimators' : [100, 200, 300, 400, 500],
-        'criterion' : ['gini', 'entropy'],
+        'n_estimators' : [50, 75, 100, 125, 150, 175, 200, 225, 250],
         'max_features' : ['auto', 'sqrt', 'log2'],
-        'max_depth' : [70, 80, 90, 100, 'None']
+        'max_depth' : [3, 5, 7, 9]
     }
     
     #weights = {0:67, 1:33}
