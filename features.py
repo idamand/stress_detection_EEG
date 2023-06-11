@@ -100,7 +100,7 @@ def time_series_features(data):
 
 def psd_features(data):
     sfreq = var.SFREQ
-    n_frequencies = 6 #default number of freqs for mnf.compute_pow_freq_bands
+    n_frequencies = 5 #default number of (freqs-1) for mnf.compute_pow_freq_bands
     n_recordings, n_channels, n_samples = data.shape
 
     features = np.empty([n_recordings, n_channels*n_frequencies])
