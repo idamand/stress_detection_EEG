@@ -162,7 +162,7 @@ def create_train_test_split(data, labels, epoch_duration):
         if subject in subjects_test:
             print(f'ERROR: Subject {subject} in both training and test list') 
    
-    print('Subjects test: ', subjects_test, '\n Subjects train: ', subjects_train)
+    #print('Subjects test: ', subjects_test, '\n Subjects train: ', subjects_train)
     
     train_data_dict, train_labels_dict = reconstruct_dicts(subjects_train, data, labels)
     test_data_dict, test_labels_dict   = reconstruct_dicts(subjects_test, data, labels)
