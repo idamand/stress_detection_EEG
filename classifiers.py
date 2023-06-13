@@ -131,10 +131,14 @@ def knn(train_data, test_data, train_labels, test_labels):
 
     '''
     param_grid = {
-        'n_neighbors': [1, 3, 5, 7, 9],
+        'n_neighbors': [1, 5, 9, 15, 19, 25, 29, 35, 39],
         'leaf_size': [5, 10, 20, 30, 40, 50],
-        'p': [1, 2]
+        'weights' : ['uniform', 'distance']
     }
+
+    scaler = StandardScaler()
+    train_data = scaler.fit_transform(train_data)
+    test_data = scaler.transform(test_data)
 
     knn_clf = GridSearchCV(KNeighborsClassifier(), param_grid, refit=True, n_jobs=-1, cv = 10)
     knn_clf.fit(train_data, train_labels)
@@ -144,7 +148,7 @@ def knn(train_data, test_data, train_labels, test_labels):
 
     cv_results = knn_clf.cv_results_
     accuracy = cv_results['mean_test_score']
-    print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
+    #print('--------------------- RESULTS FROM GRIDSEARCH --------------------- \n', cv_results)
     print('--------------------- BEST PARAMETERS FROM GRIDSEARCH --------------------- \n', knn_clf.best_params_)
     print(' OVERALL ACCURACY:', np.round(np.sum(accuracy)/len(accuracy)*100,2))    
 
