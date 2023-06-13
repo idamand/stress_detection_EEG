@@ -30,7 +30,7 @@ def read_eeg_data(data_type, filename):
     elif data_type == 'ssp':
         data_key = 'Clean_data'
     elif data_type == 'decomp':
-        data_key = '"Decomp_data"'
+        data_key = 'Decomp_data'
     else:
         print(f'No data with data_type = {data_type} found')
         return 0
