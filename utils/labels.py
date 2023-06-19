@@ -25,8 +25,10 @@ def load_pss_labels(filename, threshold):
     '''
 
     scores = pd.read_excel(filename, sheet_name='Rating 1-10', skiprows=[1])
+    #scores.iloc[:, 1:] = scores.iloc[:, 1:].applymap(
+    #    lambda x: x if pd.isna(x) else x > threshold)
     scores.iloc[:, 1:] = scores.iloc[:, 1:].applymap(
-        lambda x: x if pd.isna(x) else x > threshold)
+        lambda x: np.round(1) if x>threshold else np.round(0))
     
     return scores
 
