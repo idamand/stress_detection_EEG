@@ -58,29 +58,33 @@ def prepare_data(data_type, label_type, epoch_duration=5, feature_type='None'):
         test_data_features  = time_series_features(test_data)
         print(f"Shape of train data features set: {train_data_features.shape}")
         print(f"Shape of test data features set: {test_data_features.shape}")
+        return train_data_features, test_data_features, train_labels, test_labels
 
     elif feature_type == 'entropy':
         train_data_features = entropy_features(train_data)
         test_data_features  = entropy_features(test_data)
         print(f"Shape of train data features set: {train_data_features.shape}")
         print(f"Shape of test data features set: {test_data_features.shape}")
+        return train_data_features, test_data_features, train_labels, test_labels
 
     elif feature_type == 'hjorth':
         train_data_features = hjorth_features(train_data)
         test_data_features  = hjorth_features(test_data)
         print(f"Shape of train data features set: {train_data_features.shape}")
         print(f"Shape of test data features set: {test_data_features.shape}")
+        return train_data_features, test_data_features, train_labels, test_labels
 
     elif feature_type == 'psd':
         train_data_features = psd_features(train_data)
         test_data_features  = psd_features(test_data)
         print(f"Shape of train data features set: {train_data_features.shape}")
         print(f"Shape of test data features set: {test_data_features.shape}")
+        return train_data_features, test_data_features, train_labels, test_labels
 
     elif feature_type == 'None':
         return train_data, test_data, train_labels, test_labels
 
-    return train_data_features, test_data_features, train_labels, test_labels
+    
     
 
 

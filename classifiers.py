@@ -8,6 +8,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from metrics import compute_metrics
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import RobustScaler, StandardScaler
+from sklearn.model_selection import train_test_split
 
 from EEGNet.EEGModels import EEGNet
 from tensorflow.keras import utils as np_utils
@@ -163,12 +164,15 @@ def knn(train_data, test_data, train_labels, test_labels):
     return metrics
 
 
-def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels, val_labels, epoch_duration):
+def EEGNet_classifier(train_data, test_data, train_labels, test_labels, epoch_duration):
+
+    # Add validation set
+    training_data, validation_data, training_labels, validation_labels = train_test_split(train_data, train_labels, test_size=0.25, random_state=42, stratify=train_labels)
 
     # configure the EEGNet-8,2,16 model with kernel length of 32 samples (other 
     # model configurations may do better, but this is a good starting point)
     model = EEGNet(nb_classes=2, Chans=var.NUM_CHANNELS, Samples=(epoch_duration*var.SFREQ)+1, 
-                   dropoutRate = 0.5, kernLength = 64, F1 = 8, D = 2, F2 = 16, 
+                   dropoutRate = 0.5, kernLength = 125, F1 = 8, D = 2, F2 = 16, 
                    dropoutType = 'Dropout')
     
     # compile the model and set the optimizers
@@ -199,8 +203,8 @@ def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels
     # pretty noisy run-to-run, but most runs should be comparable to xDAWN + 
     # Riemannian geometry classification (below)
     ################################################################################
-    fittedModel = model.fit(train_data, train_labels, batch_size = 64, epochs = 300, 
-                            verbose = 2, validation_data=(val_data, val_labels),
+    fittedModel = model.fit(training_data, training_labels, batch_size = 64, epochs = 300, 
+                            verbose = 2, validation_data=(validation_data, validation_labels),
                             callbacks=[checkpointer], class_weight = class_weights)
 
     # load optimal weights
@@ -224,8 +228,9 @@ def EEGNet_classifier(train_data, test_data, val_data, train_labels, test_labels
     acc         = np.mean(preds == test_labels)
     print("Classification accuracy: %f " % (acc))
 
-    names        = ['Not stressed', 'Stressed']
-    plt.figure(0)
-    plot_confusion_matrix(preds, test_labels, names, title = 'EEGNet-8,2')
+    #names        = ['Not stressed', 'Stressed']
+    #plt.figure(0)
+    #plot_confusion_matrix(preds, test_labels, names, title = 'EEGNet-8,2')
+    compute_metrics(y_true=test_labels, y_pred=preds)
     return probs
 
