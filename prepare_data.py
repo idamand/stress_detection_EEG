@@ -1,4 +1,4 @@
-from utils.data_processing import extract_eeg_data, segment_data, create_train_test_split
+from utils.data_processing import extract_eeg_data, segment_data, create_train_test_split, dict_to_arr_labels, dict_to_arr
 from utils.labels import get_stai_labels, get_pss_labels
 from utils.valid_recordings import get_valid_recordings
 from features import time_series_features, entropy_features, hjorth_features, psd_features
@@ -87,8 +87,32 @@ def prepare_data(data_type, label_type, epoch_duration=5, feature_type='None'):
     
     
 
+def prepare_data_for_clustering(data_type, epoch_duration):
+    '''
+    Prepare data for cluster algorithms with time-series features. 
+    '''
 
+    valid_recordings = get_valid_recordings(data_type=data_type)
+    data             = extract_eeg_data(valid_recordings=valid_recordings, data_type=data_type)
 
+    
+    stai_labels = get_stai_labels(valid_recordings, cutoff=40)
+    pss_labels  = get_pss_labels(valid_recordings=valid_recordings, threshold=4)
+
+    stai_labels_arr = dict_to_arr_labels(stai_labels)
+    pss_labels_arr  = dict_to_arr_labels(pss_labels)
+
+    segmented_data, _ = segment_data(data, stai_labels, epoch_duration) #arbitrary label type for segmenting
+
+    data_arr        = dict_to_arr(data_dict=segmented_data, epoch_duration=epoch_duration)
+
+    data_features   = time_series_features(data=data_arr)
+    return data_features, stai_labels_arr, pss_labels_arr
+   
+
+    
+    
+    
 
 
         

@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.cluster import KMeans
 from metrics import compute_metrics
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import RobustScaler, StandardScaler
@@ -234,3 +235,22 @@ def EEGNet_classifier(train_data, test_data, train_labels, test_labels, epoch_du
     compute_metrics(y_true=test_labels, y_pred=preds)
     return probs
 
+
+def k_means_clustering(data):
+    '''
+    Perform K-Means clustering on data
+
+    Parameters
+    ----------
+    data : ndarray of shape (n_samples, n_features)
+
+    '''
+    scaler = StandardScaler()
+    data = scaler.fit_transform(data)
+
+    kmeans = KMeans(init='random', n_clusters=2, n_init=10, max_iter=300, random_state=42)
+    kmeans.fit(data)
+
+    labels = kmeans.labels_
+
+    return labels

@@ -213,3 +213,16 @@ def dict_to_arr(data_dict, epoch_duration):
         i += 1
 
     return data_arr
+
+def dict_to_arr_labels(data_dict):
+    keys_list = list(data_dict.keys())
+    
+    data_arr = np.empty(len(keys_list))
+    
+    i = 0
+    for key in keys_list:
+        data = data_dict[key]
+        data_arr[i] = data
+        i += 1
+
+    return data_arr
